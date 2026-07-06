@@ -5,7 +5,7 @@ entrypoint for all OData operations against a FileMaker Server database:
 query/CRUD, script invocation, container I/O, ``$metadata`` introspection,
 schema DDL, webhooks, and ``$batch`` operations.
 
-Synchronous only for v0.1.0. An ``AsyncFMSODataClient`` is planned but not
+Synchronous only for v0.2.0. An ``AsyncFMSODataClient`` is planned but not
 yet implemented; the transport/query-builder internals are structured to
 allow it as a thin parallel class (see :mod:`fms_odata.http`).
 """
@@ -43,8 +43,8 @@ class FMSODataClient:
         host: Base FMS host, e.g. ``https://fms.example.com`` (trailing
             slashes stripped).
         database: FileMaker database (solution) name.
-        token: Bearer token, ``Basic ...`` / ``FMID ...`` header value, or a
-            resolver callable. Bare strings are prefixed with ``Bearer ``.
+        token: Bearer token, ``Basic ...`` header value, or a resolver
+            callable. Bare strings are prefixed with ``Bearer ``.
         on_unauthorized: Invoked once on HTTP 401 before a single retry.
         transport: Injectable httpx transport (for testing/mocking). Defaults
             to a standard httpx transport.
@@ -160,7 +160,7 @@ class FMSODataClient:
     # -- version detection & feature gating -------------------------------
 
     def version(self) -> Optional[str]:
-        """Detect the FileMaker Server major version (``'19'``/``'21'``/``'22'``/``'26'``/``'future'``).
+        """Detect the FileMaker Server major version (``'20'``/``'21'``/``'22'``/``'26'``/``'future'``).
 
         Returns ``None`` if the version cannot be determined. Cached for the
         lifetime of this client instance.
@@ -236,7 +236,7 @@ class FMSODataClient:
     # -- webhooks ---------------------------------------------------------
 
     def webhooks(self) -> WebhookManager:
-        """Get a :class:`WebhookManager` handle (FMS 2023+ / v21)."""
+        """Get a :class:`WebhookManager` handle (FMS 2025+ / v22)."""
         if self._webhook_manager is None:
             self._webhook_manager = WebhookManager(self)
         return self._webhook_manager
@@ -244,17 +244,21 @@ class FMSODataClient:
     def create_webhook(self, params: dict) -> Any:
         return self.webhooks().create(params)
 
-    def remove_webhook(self, webhook_id: str) -> Any:
+    def remove_webhook(self, webhook_id: Union[str, int]) -> Any:
         return self.webhooks().remove(webhook_id)
 
-    def get_webhook(self, webhook_id: str) -> Any:
+    def delete_webhook(self, webhook_id: Union[str, int]) -> Any:
+        """Alias for :meth:`remove_webhook` (matches the FMS endpoint name)."""
+        return self.webhooks().delete(webhook_id)
+
+    def get_webhook(self, webhook_id: Union[str, int]) -> Any:
         return self.webhooks().get(webhook_id)
 
     def get_all_webhooks(self) -> Any:
         return self.webhooks().get_all()
 
-    def invoke_webhook(self, webhook_id: str) -> Any:
-        return self.webhooks().invoke(webhook_id)
+    def invoke_webhook(self, webhook_id: Union[str, int], row_ids: Optional[list] = None) -> Any:
+        return self.webhooks().invoke(webhook_id, row_ids=row_ids)
 
     # -- batch ------------------------------------------------------------
 

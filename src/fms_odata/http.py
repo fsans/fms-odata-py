@@ -18,7 +18,7 @@ Synchronous only for v0.1.0. Built on ``httpx.Client``.
 
 Responsibilities (mirrors ``src/http.ts`` in fms-odata-js):
 
-- Authorization header resolution (Basic, Bearer, FMID, auto-detected).
+- Authorization header resolution (Basic or Bearer/OAuth, auto-detected).
 - Timeout handling via httpx.
 - 401 retry via ``on_unauthorized`` (once).
 - Error envelope normalization into ``fms_odata_spec.FMODataError`` (and
@@ -54,7 +54,7 @@ __all__ = [
 ]
 
 #: Schemes that pass through verbatim; bare tokens get ``Bearer `` prefixed.
-_AUTH_SCHEME_RE = re.compile(r"^(basic|bearer|fmid|negotiate|digest)\s+\S", re.I)
+_AUTH_SCHEME_RE = re.compile(r"^(basic|bearer|negotiate|digest)\s+\S", re.I)
 
 _ACCEPT_DEFAULTS = {
     "json": "application/json",
@@ -69,7 +69,7 @@ def resolve_auth_header(provider: TokenProvider) -> str:
     """Resolve a :data:`TokenProvider` to a complete Authorization header value.
 
     Bare strings are prefixed with ``Bearer ``; scheme-prefixed values
-    (``Basic``, ``Bearer``, ``FMID``, ``Negotiate``, ``Digest``) pass through.
+    (``Basic``, ``Bearer``, ``Negotiate``, ``Digest``) pass through.
     """
     raw = provider() if callable(provider) else provider
     if not isinstance(raw, str) or len(raw) == 0:

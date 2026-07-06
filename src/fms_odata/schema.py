@@ -78,7 +78,7 @@ class SchemaEditor:
         _validate_field_definitions(params["fields"])
         import json as _json
 
-        url = f"{self._client.base_url}/FileMaker_Tables('{encode_path_segment(params['tableName'])}')"
+        url = f"{self._client.base_url}/FileMaker_Tables/{encode_path_segment(params['tableName'])}"
         return execute_json(
             self._client._ctx,
             url,
@@ -102,7 +102,7 @@ class SchemaEditor:
                 f'SchemaEditor: delete_table("{table_name}") requires confirm=True -- '
                 "this operation permanently destroys the table and all its records."
             )
-        url = f"{self._client.base_url}/FileMaker_Tables('{encode_path_segment(table_name)}')"
+        url = f"{self._client.base_url}/FileMaker_Tables/{encode_path_segment(table_name)}"
         execute_json(
             self._client._ctx,
             url,
@@ -124,7 +124,7 @@ class SchemaEditor:
                 "this operation permanently destroys the field and all its data."
             )
         url = (
-            f"{self._client.base_url}/FileMaker_Tables('{encode_path_segment(table_name)}')"
+            f"{self._client.base_url}/FileMaker_Tables/{encode_path_segment(table_name)}"
             f"/{encode_path_segment(field_name)}"
         )
         execute_json(

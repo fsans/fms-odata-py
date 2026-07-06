@@ -11,7 +11,7 @@ types, error hierarchy, auth helpers, and URL literal formatting.
 
 - `pip install -e ".[dev]"` — install in editable mode with dev deps
 - `python -m build` — build sdist + wheel
-- `pytest` — run test suite (162 tests, offline, uses httpx MockTransport)
+- `pytest` — run test suite (168 tests, offline, uses httpx MockTransport)
 
 ## Test commands
 
@@ -36,12 +36,12 @@ types, error hierarchy, auth helpers, and URL literal formatting.
 
 ## Key conventions
 
-- **Synchronous only (v0.1.0).** No async code yet. The transport/query/entity
+- **Synchronous only (v0.2.0).** No async code yet. The transport/query/entity
   layers are structured to allow a future `AsyncFMSODataClient` as a thin
   parallel class — do not introduce I/O calls into `query.py`, `entity.py`,
   or `url.py`.
 - **Reuse spec-py types.** Error classes (`FMODataError`, `FMScriptError`,
-  `FMAuthError`, etc.), auth helpers (`basic_auth`, `fmid_auth`), URL literal
+  `FMAuthError`, etc.), auth helpers (`basic_auth`, `bearer_auth`), URL literal
   formatting (`escape_string_literal`, `format_literal`), and script response
   parsing are sourced from `fms_odata_spec`. Do not redefine them locally.
 - **`from_` not `from`.** The query entry point is `db.from_(entity_set)`

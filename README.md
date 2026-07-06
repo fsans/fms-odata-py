@@ -10,7 +10,7 @@ Functional equivalent of [fms-odata-js](https://github.com/fsans/fms-odata-js).
 
 ## Status
 
-**v0.1.0** — synchronous client only. An async variant (`AsyncFMSODataClient`)
+**v0.2.0** — synchronous client only. An async variant (`AsyncFMSODataClient`)
 is planned but not yet implemented. The transport and query-builder internals
 are structured to allow it as a thin parallel class (see
 [Architecture](#architecture)).
@@ -24,7 +24,7 @@ pip install fms-odata-py
 Dependencies:
 
 - [`httpx`](https://www.python-httpx.org/) >= 0.27 — HTTP client
-- [`fms-odata-spec`](https://pypi.org/project/fms-odata-spec/) >= 0.1.0 — shared types, error hierarchy, auth helpers, URL literal formatting
+- [`fms-odata-spec`](https://pypi.org/project/fms-odata-spec/) >= 2.0.1 — shared types, error hierarchy, auth helpers, URL literal formatting
 
 ## Quick start
 
@@ -73,7 +73,7 @@ with open("photo.png", "wb") as fh:
 
 # Metadata & version detection
 meta = db.metadata()
-print(db.version())        # '19', '21', '22', '26', 'future', or None
+print(db.version())        # '20', '21', '22', '26', 'future', or None
 print(db.has_feature("apply_aggregation"))
 
 db.close()
@@ -96,7 +96,7 @@ Entrypoint for all OData operations.
 |---|---|---|---|
 | `host` | `str` | yes | FMS host, e.g. `https://fms.example.com` (trailing slashes stripped). |
 | `database` | `str` | yes | FileMaker database (solution) name. URL-encoded into base URL. |
-| `token` | `str \| Callable[[], str]` | yes | Auth header value or resolver. Bare strings get `Bearer ` prefixed; scheme-prefixed (`Basic ...`, `FMID ...`) pass through. |
+| `token` | `str \| Callable[[], str]` | yes | Auth header value or resolver. Bare strings get `Bearer ` prefixed; scheme-prefixed (`Basic ...`, `Bearer ...`) pass through. |
 | `on_unauthorized` | `Callable[[], None]` | no | Invoked once on HTTP 401, then a single retry. |
 | `transport` | `httpx.BaseTransport` | no | Injectable transport (for testing/mocking). |
 | `timeout_ms` | `int` | no | Per-request timeout in milliseconds. |
@@ -113,14 +113,14 @@ Entrypoint for all OData operations.
 | `script_by_id(fmsid, parameter?)` | Invoke a script by immutable FMSID (v26+). |
 | `metadata(opts?)` | Fetch and parse `$metadata` CSDL. Cached. |
 | `metadata_xml(opts?)` | Fetch raw `$metadata` XML. |
-| `version()` | Detect major version (`'19'`/`'21'`/`'22'`/`'26'`/`'future'`/`None`). Cached. |
+| `version()` | Detect major version (`'20'`/`'21'`/`'22'`/`'26'`/`'future'`/`None`). Cached. |
 | `server_version()` | Full parsed `FMServerVersion`. Cached. |
 | `version_info()` | Full `FMVersionInfo` (feature flags + query-option flags). |
 | `has_feature(feature)` | Boolean feature gate. |
 | `schema()` | Get a `SchemaEditor` handle for DDL. |
 | `create_table(params)` / `add_fields(params)` / ... | Convenience DDL proxies. |
-| `webhooks()` | Get a `WebhookManager` handle (v21+). |
-| `create_webhook(params)` / `remove_webhook(id)` / ... | Convenience webhook proxies. |
+| `webhooks()` | Get a `WebhookManager` handle (v22+). |
+| `create_webhook(params)` / `remove_webhook(id)` / `delete_webhook(id)` / ... | Convenience webhook proxies. |
 | `batch()` | Create a `$batch` builder. |
 | `close()` | Close the underlying httpx client. |
 
@@ -245,7 +245,7 @@ same query-builder/entity logic and swaps the transport for an
 | `batch.send()` → per-op Promise handles | `batch.send()` → `BatchResult.responses` (indexed list) | Sync idiom: no Promise equivalent. |
 | `FMOData` / `FMODataError` deprecated aliases | — | Skipped (clean slate, no legacy). |
 | `basicAuth(user, pass)` | `basic_auth(user, pass)` | From `fms_odata_spec`. |
-| `fmidAuth(token)` | `fmid_auth(token)` | From `fms_odata_spec`. |
+| `bearerAuth(token)` | `bearer_auth(token)` | From `fms_odata_spec`. |
 
 ## Development
 
@@ -253,7 +253,7 @@ same query-builder/entity logic and swaps the transport for an
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest                  # 162 tests
+pytest                  # 168 tests
 python -m build         # sdist + wheel
 ```
 

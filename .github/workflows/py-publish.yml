@@ -1,0 +1,57 @@
+name: py-publish
+
+# Publishes fms-odata-py to PyPI when a v* tag is pushed.
+#
+# Requires a repository secret named PYPI_API_TOKEN containing a PyPI
+# API token (https://pypi.org/manage/account/token/). A project-scoped
+# token is recommended once the project exists on PyPI.
+#
+# Tag scheme: vX.Y.Z (this repo is Python-only, so no py- prefix is
+# needed, unlike the fms-odata-spec repo which shares TS + Python tags).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install build + publish tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: pytest -ra
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload --non-interactive dist/*
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/*

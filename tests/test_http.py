@@ -23,7 +23,6 @@ def test_resolve_auth_header_prefixes_bare_tokens():
 def test_resolve_auth_header_passes_through_scheme_prefixed():
     assert resolve_auth_header("Basic dXNlcjpwYXNz") == "Basic dXNlcjpwYXNz"
     assert resolve_auth_header("Bearer x.y.z") == "Bearer x.y.z"
-    assert resolve_auth_header("FMID zzz") == "FMID zzz"
 
 
 def test_resolve_auth_header_calls_callable():

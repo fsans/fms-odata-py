@@ -96,9 +96,9 @@ def test_parse_metadata_extracts_keys_and_properties():
 # -- version detection ------------------------------------------------------
 
 
-def test_detects_version_19():
-    db = make_metadata_client(metadata_with_version("19.0.1"))
-    assert db.version() == "19"
+def test_detects_version_20():
+    db = make_metadata_client(metadata_with_version("20.0.1"))
+    assert db.version() == "20"
     db.close()
 
 
@@ -178,7 +178,7 @@ def test_has_feature_true_for_supported():
 
 
 def test_has_feature_false_for_unsupported():
-    db = make_metadata_client(metadata_with_version("19.0.1"))
+    db = make_metadata_client(metadata_with_version("20.0.1"))
     assert db.has_feature("apply_aggregation") is False
     assert db.has_feature("webhooks") is False
     assert db.has_feature("scripts_by_fmsid") is False

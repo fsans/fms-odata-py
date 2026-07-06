@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fms-odata-py"
-version = "0.1.0"
+version = "0.2.0"
 description = "Synchronous Python client for the FileMaker Server OData v4 API. Functional equivalent of fms-odata-js."
 readme = "README.md"
 license = "MIT"
@@ -28,7 +28,7 @@ classifiers = [
 keywords = ["filemaker", "claris", "odata", "fms", "client", "rest", "sync"]
 dependencies = [
     "httpx>=0.27",
-    "fms-odata-spec>=0.1.0",
+    "fms-odata-spec>=2.0.1",
 ]
 
 [project.optional-dependencies]

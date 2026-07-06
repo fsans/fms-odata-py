@@ -81,7 +81,7 @@ def test_delete_table_with_confirm_issues_delete():
 
     db = make_client(handler)
     db.delete_table("OldTable", confirm=True)
-    assert captured["url"] == f"{BASE}/FileMaker_Tables('OldTable')"
+    assert captured["url"] == f"{BASE}/FileMaker_Tables/OldTable"
     assert captured["method"] == "DELETE"
     db.close()
 
@@ -102,7 +102,7 @@ def test_add_fields_patches_table():
             "fields": [{"name": "Phone", "type": "varchar(30)"}],
         }
     )
-    assert captured["url"] == f"{BASE}/FileMaker_Tables('Company')"
+    assert captured["url"] == f"{BASE}/FileMaker_Tables/Company"
     assert captured["method"] == "PATCH"
     assert captured["body"]["fields"] == [{"name": "Phone", "type": "varchar(30)"}]
     db.close()

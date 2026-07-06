@@ -289,7 +289,7 @@ class Query:
         self._state.search = term
         return self
 
-    # -- $apply (aggregation) -- requires FMS 22.0.1+ (FileMaker 2024) -----
+    # -- $apply (aggregation) -- requires FMS 22.0.1+ (FileMaker 2025) -----
 
     def apply(self, expr: str) -> "Query":
         """Set a raw ``$apply`` expression."""
